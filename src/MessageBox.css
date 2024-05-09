@@ -1,0 +1,28 @@
+.messageArea {
+  border: 2px solid black;
+  height: 300px;
+  min-height: 200px;
+  flex-flow: column-reverse;
+  overflow-y:auto;
+  margin-top: auto;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  padding-left:1rem;
+}
+.messageText {
+    font-weight: normal;
+    font-family: Arial, sans-serif;
+}
+.messageText.player-0 {
+    color:black;
+    font-weight: bold;
+  }
+
+.messageText.player-1 {
+    color:rgb(27, 0, 180);
+  }
+
+.messageText.player-2 {
+    color:rgb(156, 0, 0);
+  }
