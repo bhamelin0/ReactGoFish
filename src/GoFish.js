@@ -14,6 +14,12 @@ while(hand1.length < 7) {
     hand2.push(deck.draw());
 }
 
+function CardSortButton({onSortClick}) {
+    return (
+        <button className="card-sorter" onClick={onSortClick}>Sort my cards</button>
+    )
+}
+
 function Card({card, hidden, onCardClick}) {
     var cssSuit = card.suit === "diamonds" ? "diams" : card.suit;
     var className = hidden? "card back" : `card rank-${card.value.toLowerCase()} ${cssSuit}`;
@@ -226,6 +232,24 @@ function GoFish() {
         setP1Hand([...p1Hand]);
     }
 
+    const cardValueTable = {J: 11, Q:12, K:13};
+    const cardSuitTable = {hearts: 1, diamonds: 2, spades: 3, clubs: 4};
+    function handleSortClick() {
+
+        //We want to sort by number, then by suit, so that like numbers are beside each other in our hand
+        const newP1Hand = p1Hand.sort((a,b) => {
+            const aValue = cardValueTable[a.value] ? cardValueTable[a.value] : parseInt(a.value);
+            const bValue = cardValueTable[b.value] ? cardValueTable[b.value] : parseInt(b.value);
+
+            if(aValue == bValue) {
+                return cardSuitTable[a.suit] - cardSuitTable[b.suit];
+            }
+
+            return aValue - bValue;
+        });
+        setP1Hand([...newP1Hand]);
+    }
+
     return (
         <div className="goFish">
             <h1>Go fish!</h1>
@@ -251,10 +275,12 @@ function GoFish() {
                     <Card key={`${card.value},${card.suit}`} card={card} onCardClick={() => handleCardClick(card)}/>
                 )}
             </div>
-
+            <CardSortButton onSortClick={() => handleSortClick()}/>
             <MessageBox messageList={logText}/>
         </div>
     ); 
+
+    
 };
 
 export default GoFish;
