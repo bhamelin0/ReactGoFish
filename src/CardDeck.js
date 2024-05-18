@@ -1,7 +1,5 @@
 // object to represent a deck of cards for use in various card games
 
-const { create } = require("react-test-renderer");
-
 var suits = ["hearts", "spades", "diamonds", "clubs"];
 var values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
