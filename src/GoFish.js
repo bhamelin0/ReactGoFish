@@ -1,5 +1,4 @@
-import { React } from "react";
-import { useState, useEffect, } from 'react';
+import React, { useState, useEffect } from "react";
 import createDeck from './CardDeck.js';
 import MessageBox from './MessageBox.js'
 import './selfThinkerCards/cards.css';
