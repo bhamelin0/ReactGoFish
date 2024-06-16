@@ -64,16 +64,6 @@ function GoFish() {
     const [p2Sets, setP2Sets] = useState(0);
     const [winnerText, setWinnerText] = useState("");
 
-    useEffect(() => {
-        if(currentPlayer === 2) {
-            performAITurn(false, p2Sets);
-        } else {
-            if(!p1Hand.length && deck.length()) {
-                setP1Hand([...p1Hand, ...deck.draw()])
-            }
-        }
-    }, [currentPlayer])
-
 
     useEffect(() => {
         if(p1Sets + p2Sets === 13) {
@@ -101,141 +91,117 @@ function GoFish() {
         return hadCard;
     }
 
-    async function performAITurn (goAgain, setCount) {
-        var drawnCard, set, x;
-
-        await new Promise(resolve => setTimeout(resolve, 500));
-        if(goAgain) {
-            printToLog(2, `I will make another guess. Hm.....`);
-        } else {
-            printToLog(2, `It is my turn!`);
-        }
-
-        player1DuringTurn = false;
-        await new Promise(resolve => setTimeout(resolve, 500));
-        if(!p2Hand.length) {
-            if(deck.length() > 0) {
-                printToLog(2, "I don't have any cards, so I'll draw one.");
-                drawnCard = deck.draw();
-                p2Hand.push(drawnCard);
-                setDeckLength(deck.length());
-            } else {
-                printToLog(2, "I can't draw any cards and I have none left. Game over!");
-                setP2Sets(setCount);
-                return;
-            }
-        } 
-        
-        var card = p2Hand[Math.floor(Math.random() * p2Hand.length)];
- 
-        await new Promise(resolve => setTimeout(resolve, 500));
-        printToLog(2, `Do you have any ${card.value}'s?`);
-
-        await new Promise(resolve => setTimeout(resolve, 500));
-        var gotMatch = takeMatchingCards(card, p2Hand, p1Hand);
-        if(!gotMatch) {
-            await new Promise(resolve => setTimeout(resolve, 500));
-            printToLog(1, `No. Go fish!`);
-            drawnCard = deck.draw();
-            if(drawnCard) {
-                if(drawnCard.value === card.value) {
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    printToLog(2, `I drew what I asked for!`);
-                    gotMatch = 1;
-                }
-                p2Hand.push(drawnCard);
-                setDeckLength(deck.length());
-                card = drawnCard; //Evaluate if we completed a set with the card we drew, rather than the card we requested and didn't get
-            } else {
-                await new Promise(resolve => setTimeout(resolve, 500));
-                printToLog(1, `I can't - there are no cards left!`);
-            }
-        } else {
-            printToLog(1, `Yes, ${gotMatch}, here you go.`);
-            setP1Hand([...p1Hand]);
-        }
-
-        set = checkForSet(p2Hand, card);
-        if(set.length === 4) {
-            await new Promise(resolve => setTimeout(resolve, 500));
-            printToLog(2, `I have completed the ${card.value} set!`);
-            setCount++;
-            for(x = set.length - 1; x >= 0; x--) {
-                p2Hand.splice(set[x], 1);
-            }
-        }
-
-        setP2Hand([...p2Hand]);
-        if(!gotMatch) {
-            setP2Sets(setCount);
-            setCurrentPlayer(1);
-        } else {
-            performAITurn(true, setCount);
-        }
-    };
-
     async function handleCardClick(card) {
+        // Block clicking unless it is our turn
         if(currentPlayer === 2 || player1DuringTurn ){ return; }
         player1DuringTurn = true;
         
         if(!p1Hand.includes(card)) {
             return;
         }
+
+        handleGoFishCard(card, 1);
+    }
+
+    async function performAITurn (setCount) {
+        var card = p2Hand[Math.floor(Math.random() * p2Hand.length)];
+        handleGoFishCard(card, 2, setCount);
+    };
+
+    async function handleGoFishCard(card, player, aiSetCount) {
+        var drawnCard;
+
+        const currentPlayerHand = player == 1 ? p1Hand : p2Hand;
+        const otherPlayerHand = player == 1 ? p2Hand : p1Hand;
+        const otherPlayer  = player == 1 ? 2 : 1;
         
-        printToLog(1, `Do you have any ${card.value}'s?`);
-        var gotMatch = takeMatchingCards(card, p1Hand, p2Hand);
+        printToLog(player, `Do you have any ${card.value}'s?`);
+        var gotMatch = takeMatchingCards(card, currentPlayerHand, otherPlayerHand);
         if(!gotMatch) {
             await new Promise(resolve => setTimeout(resolve, 100));
-            printToLog(2, `No. Go fish!`);
+            printToLog(otherPlayer, `No. Go fish!`);
             if(deck.length() > 0) {
                 var drawnCard = deck.draw();
                 if(drawnCard.value === card.value) {
-                    printToLog(1, `I drew what I asked for!`);
+                    printToLog(player, `I drew what I asked for!`);
                     gotMatch = 1;
                 }
-                p1Hand.push(drawnCard);
+                currentPlayerHand.push(drawnCard);
                 setDeckLength(deck.length());
             } else {
-                printToLog(1, "There are no more cards, I can't go fish!");
+                printToLog(otherPlayer, "There are no more cards, I can't go fish!");
             }
         } else {
-            printToLog(2, `Yes, ${gotMatch}, here you go.`);
-            printToLog(1, `I'll guess again!`);
+            printToLog(otherPlayer, `Yes, ${gotMatch}, here you go.`);
             setP2Hand([...p2Hand]);
+            setP1Hand([...p1Hand]);
         }   
 
-        var set = checkForSet(p1Hand, card);
+        if (drawnCard) {
+            card = drawnCard; // Ensure we find sets for what we actually drew
+        }
+
+        var set = checkForSet(currentPlayerHand, card);
         if(set.length === 4) {
             await new Promise(resolve => setTimeout(resolve, 100));
-            printToLog(1, `I have completed the ${card.value} set!`);
-            setP1Sets(p1Sets + 1);
+            printToLog(player, `I have completed the ${card.value} set!`);
+            aiSetCount++;
+
+            player == 1 ? setP1Sets(p1Sets + 1) : setP2Sets(aiSetCount);
+
             for(var x = set.length - 1; x >= 0; x--) {
-                p1Hand.splice(set[x], 1);
+                currentPlayerHand.splice(set[x], 1);
             }
         }
         
         await new Promise(resolve => setTimeout(resolve, 100));
-        if(!gotMatch) {
-            setCurrentPlayer(2);
-        } else if(p1Hand.length === 0) {
+
+        setP1Hand([...p1Hand]);
+        setP2Hand([...p2Hand]);
+
+        //Handle ending the turn
+        if(gotMatch && currentPlayerHand.length === 0) { // Deal with empty hand case
             if(deck.length() > 0 ) {
-                printToLog(1, "I don't have any cards, so I'll draw one.");
+                await new Promise(resolve => setTimeout(resolve, 100));
+                printToLog(player, "But I don't have any cards, so I'll draw one.");
                 drawnCard = deck.draw();
-                p1Hand.push(drawnCard);
+                currentPlayerHand.push(drawnCard);
                 setDeckLength(deck.length());
+                setP1Hand([...p1Hand]);
             } else {
-                printToLog(1, "I can't draw any cards and I have none left. Game over!");
+                printToLog(player, "But I can't draw any cards and I have none left. Game over!");
             }
         }
 
-        setP1Hand([...p1Hand]);
+        if(gotMatch) {  // Deal with repeat turn case
+            printToLog(player, `I get to guess again!`);
+
+             //If it was the player turn, we are waiting for the next card click
+            if(player == 2) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                performAITurn(aiSetCount);
+            }
+
+        } else { // Deal with switching turn case
+            printToLog(player, "My turn is over. Your turn.");
+
+            if(player == 1) {
+                setCurrentPlayer(2);
+                performAITurn(p2Sets)
+            } else {
+                //If it was the AI turn, we change the player and just wait for a card to be clicked
+                setP2Sets(aiSetCount);
+                setCurrentPlayer(1);
+                
+            }
+        } 
     }
 
     const cardValueTable = {J: 11, Q:12, K:13};
     const cardSuitTable = {hearts: 1, diamonds: 2, spades: 3, clubs: 4};
     function handleSortClick() {
 
-        //We want to sort by number, then by suit, so that like numbers are beside each other in our hand
+        // We want to sort by number, then by suit, so that like numbers are beside each other in our hand
         const newP1Hand = p1Hand.sort((a,b) => {
             const aValue = cardValueTable[a.value] ? cardValueTable[a.value] : parseInt(a.value);
             const bValue = cardValueTable[b.value] ? cardValueTable[b.value] : parseInt(b.value);
