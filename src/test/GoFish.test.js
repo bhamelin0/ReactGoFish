@@ -1,3 +1,4 @@
+import React from "react";
 import GoFish from '../GoFish.js';
 import {cleanup, render} from '@testing-library/react';
 import '@testing-library/jest-dom'
