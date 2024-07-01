@@ -6,17 +6,21 @@ import jest from 'eslint-plugin-jest';
 
 
 export default [
-    {files: ["src/**/*.{js,mjs,cjs,jsx}"]},
-    { languageOptions: { 
-        parserOptions: { ecmaFeatures: { jsx: true } } ,
-        globals: {
+{ 
+    files: ["*/**/*.{js,mjs,cjs,jsx}"],
+    languageOptions: { 
+    parserOptions: { ecmaFeatures: { jsx: true } } ,
+    globals: {
         ...globals.browser,
-        ...globals.jest
-    }}},
-    pluginJs.configs.recommended,
+        ...globals.jest,
+        ...globals.node
+    }},
+
+    plugins: { jest },
+    rules: {
+    ...jest.configs.recommended.rules,
+    ...pluginJs.configs.recommended.rules
+    }
+},
     ...fixupConfigRules(pluginReactConfig),
-    { plugins: { jest }},
-    { rules: {
-      ...jest.configs.recommended.rules,
-    }}
 ];

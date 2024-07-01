@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from 'prop-types';
 import createDeck from './CardDeck.js';
 import MessageBox from './MessageBox.js'
 import './selfThinkerCards/cards.css';
@@ -19,6 +20,10 @@ function CardSortButton({onSortClick}) {
     )
 }
 
+CardSortButton.propTypes = {
+    onSortClick: PropTypes.func.isRequired
+}
+
 function Card({card, hidden, onCardClick}) {
     var cssSuit = card.suit === "diamonds" ? "diams" : card.suit;
     var className = hidden? "card back" : `card rank-${card.value.toLowerCase()} ${cssSuit}`;
@@ -32,6 +37,12 @@ function Card({card, hidden, onCardClick}) {
     )
 }
 
+Card.propTypes = {
+    card: PropTypes.object.isRequired,
+    hidden: PropTypes.bool.isRequired,
+    onCardClick: PropTypes.func.isRequired
+}
+
 function Deck({deckLength}) {
     return (
         <div className="card back">
@@ -39,6 +50,11 @@ function Deck({deckLength}) {
         </div>
     )
 }
+
+Deck.propTypes = {
+    deckLength: PropTypes.number.isRequired,
+}
+
 
 function checkForSet(hand, newCard) {
     const indexes = [];
@@ -121,7 +137,7 @@ function GoFish() {
             await new Promise(resolve => setTimeout(resolve, 100));
             printToLog(otherPlayer, `No. Go fish!`);
             if(deck.length() > 0) {
-                var drawnCard = deck.draw();
+                drawnCard = deck.draw();
                 if(drawnCard.value === card.value) {
                     printToLog(player, `I drew what I asked for!`);
                     gotMatch = 1;

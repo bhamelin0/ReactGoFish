@@ -21,9 +21,10 @@ it('draws 52 cards, then returns null when drawing an empty deck', () => {
     const newDeck = createDeck();
     const drawnCards = new Array();
     
-    var newCard;
-    while(newCard = newDeck.draw()) {
+    var newCard = newDeck.draw();
+    while(newCard != null) {
         drawnCards.push(newCard);
+        newCard = newDeck.draw();
     }
 
     expect(drawnCards.length).toBe(52);
@@ -38,10 +39,11 @@ it('draws random cards after shuffling', () => {
     const drawnCards = new Array();
     const drawnShuffledCards = new Array();
 
-    var newBaseCard;
-    while(newBaseCard = unshuffledDeck.draw()) {
+    var newBaseCard = unshuffledDeck.draw();
+    while(newBaseCard != null) {
         drawnCards.push(newBaseCard);
         drawnShuffledCards.push(shuffledDeck.draw());
+        newBaseCard = unshuffledDeck.draw();
     }
 
     expect(drawnCards).not.toStrictEqual(drawnShuffledCards);
