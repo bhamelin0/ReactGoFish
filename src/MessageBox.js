@@ -20,6 +20,7 @@ function MessageBox({messageList}) {
         scrollToElement();
     }, [messageList])
     
+    var apple = 3;
     const messagesEndRef = useRef();
     const scrollToElement = () => {
         const {current} = messagesEndRef;
