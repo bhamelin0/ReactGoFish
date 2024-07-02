@@ -1,8 +1,8 @@
 import React, { useRef, useEffect} from "react";
+import PropTypes from 'prop-types';
 import './MessageBox.css';
 
-
-function ChatMessage({message, index}) {
+function ChatMessage({message}) {
     var className = `messageText player-${message.player}`;
     const fullMessage = `${message.player > 0 ? `Player ${message.player}:` : ""} ${message.line}`;
     return(
@@ -10,6 +10,9 @@ function ChatMessage({message, index}) {
     )
 }
 
+ChatMessage.propTypes = {
+    // message: PropTypes.object.isRequired
+}
 
 function MessageBox({messageList}) {
 
@@ -17,6 +20,7 @@ function MessageBox({messageList}) {
         scrollToElement();
     }, [messageList])
     
+    var apple = 3;
     const messagesEndRef = useRef();
     const scrollToElement = () => {
         const {current} = messagesEndRef;
@@ -38,6 +42,8 @@ function MessageBox({messageList}) {
     )
 }
 
-
+MessageBox.propTypes = {
+    messageList: PropTypes.array.isRequired
+}
 
 export default MessageBox;
