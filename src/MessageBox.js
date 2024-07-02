@@ -11,7 +11,7 @@ function ChatMessage({message}) {
 }
 
 ChatMessage.propTypes = {
-    // message: PropTypes.object.isRequired
+    message: PropTypes.object.isRequired
 }
 
 function MessageBox({messageList}) {
